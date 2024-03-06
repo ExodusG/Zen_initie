@@ -1,0 +1,8 @@
+Testsuite: test.jeu.JeuTest
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0,102 sec
+
+Testcase: testgetCourant took 0,02 sec
+Testcase: testJeuWithCorrectValues took 0 sec
+Testcase: testJeuWithNull took 0 sec
+Testcase: testChangeCourant took 0 sec
+Testcase: testJeuWithNull2 took 0 sec

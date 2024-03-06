@@ -1,0 +1,118 @@
+<project name="Zen l'initie" default="compil" basedir="."> 
+	<description> permet de developper l'environement de travail, permet de faire la compilation
+	la javadoc et le .jar. On peut aussi lancé le .jar ainsi que la classe contenant le main</description>
+	
+	<!-- Initialisation des variables contenant le chemin des fichiers utile a tous les targets--> 
+	<property name="src" location="..\src" />
+	<property name="class" location="..\class" />
+	<property name="javadoc" location="..\javadoc" />
+	<property name="jar" location="..\dossierJar" /> 
+	<property name="report" location="..\reportTest" /> 
+	<property name="data" location="..\data" /> 
+	<property name="JUNIT_HOME" location="..\lib" />
+  <!-- =================================================================== --> 
+  <!-- target --> 
+  <!-- =================================================================== --> 
+		
+
+	 <!-- création des dossier -->
+	<target name="setSrc" description="créer le dossier src">
+		<delete dir="${src}"/>
+		<mkdir dir="${src}"/>
+	</target>
+	
+	<target name="setClass" description="créer le dossier class">
+		<delete dir="${class}"/>
+		<mkdir dir="${class}"/>
+	</target>
+	
+	<target name="setDoc" description="créer le dossier javadoc">
+		<delete dir="${javadoc}"/>
+		<mkdir dir="${javadoc}"/>
+	</target>
+	
+	<target name="setJar" description="créer le dossier jar">
+		<delete dir="${jar}"/>
+		<mkdir dir="${jar}"/>
+	</target>
+	
+	<target name="setReport" description="créer le dossier reportTest">
+		<delete dir="${report}"/>
+		<mkdir dir="${report}"/>
+	</target>
+	
+	<target name="setFile" description="créer tous les dossiers" depends="setSrc,setClass,setDoc,setJar,setReport"/>
+	
+	<!-- compilation -->
+	<target name="compil" description="compile tous les fichiers du src" depends="setClass"> 
+		<javac srcdir="${src}" destdir="${class}" includeantruntime="false"> 
+			<classpath location="${JUNIT_HOME}\junit-4.12.jar"/>
+			<classpath location="${JUNIT_HOME}\hamcrest-core-1.3.jar"/>
+		</javac>
+		<copy todir="${class}" >
+			<fileset dir="${data}" >
+				<exclude name="regle.pdf"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	
+	<!-- execute les tests JUnit -->
+	<target name="test" description="Executer les tests avec JUnit" depends="compil,setReport">
+           <junit fork="true" haltonerror="true" haltonfailure="false" printsummary="true">
+				<formatter type="xml"/>
+				<formatter type="plain"/>
+				<batchtest todir="${report}">
+					<fileset dir="${class}" includes="**/*Test.class"/>
+				</batchtest>
+           </junit>
+    </target>
+	
+	<!-- créer les rapports de tests JUnit en HTML -->
+	<target name="report" description="créer les rapports de tests" depends="test">
+			<junitreport todir="${report}">
+				<fileset dir="${report}">
+					<include name="TEST-*.xml"/>
+				</fileset>
+				<report format="frames" todir="${report}"/>
+			</junitreport>
+	</target>
+	
+	<!-- execute le main -->
+	<target name="run" description="lance la classe contenant le main" depends="compil"> 
+		<java classname="ZenLInitie"/> 
+	</target>  
+	
+	<!-- javadoc -->
+	<target name="javadoc" description="génere la javadoc" depends="setDoc,compil">
+		<javadoc sourcepath="${src}" destdir="${javadoc}" author="true" use="true" 
+				windowtitle="zen l'inité - API" private="true" charset="utf8">
+			<fileset dir="${src}" defaultexcludes="yes"> 
+				<include name="*.java" /> 
+			</fileset> 
+		</javadoc> 
+	</target> 
+	
+	<!-- jar -->
+	<target name="jar" description="génere le .jar du jeu" depends="setJar,compil"> 
+		<jar jarfile="${jar}/Zen-l-initié.jar" basedir="${class}">
+			<exclude name="**/*Test.class"/>
+			<manifest>
+				<attribute name="Main-Class" value="ZenLInitie"/> 
+			</manifest> 
+		</jar> 
+	</target> 
+	
+	<!-- lance le jar -->
+	<target name="runJar" description="lance le .jar" depends="jar"> 
+		<java jar="${jar}/Zen-l-initié.jar" fork="true"> 	
+		</java> 
+	</target> 
+	
+	<!-- supprime src et class -->
+	<target name="clear" description="supprime les class et sources">
+		<delete dir="${class}"/>
+		<delete dir="${src}"/>
+	</target>
+	
+</project>
